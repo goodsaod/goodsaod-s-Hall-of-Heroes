@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaldea Archive | 迦勒底英灵档案</title>
+<!-- 引入图片裁剪库 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<!-- 引入谷歌字体 -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+--fgo-gold: #d4af37;
+--fgo-gold-light: #f9df86;
+--fgo-blue: #1a237e;
+--fgo-dark: #0a0c10;
+--fgo-panel: #151922;
+--fgo-red: #b71c1c;
+--fgo-cyan: #00bcd4;
+--fgo-buster: #d32f2f;
+--fgo-arts: #1976d2;
+--fgo-quick: #388e3c;
+--text-main: #eceff1;
+--text-sub: #90a4ae;
+}
+body {
+margin: 0;
+font-family: 'Noto Serif SC', 'Georgia', serif;
+background-color: var(--fgo-dark);
+color: var(--text-main);
+overflow-x: hidden;
+background: radial-gradient(circle at 50% 30%, #1a237e 0%, #05070a 70%);
+background-attachment: fixed;
+user-select: none;
+}
+.magic-particles {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+pointer-events: none; z-index: -1;
+background-image: 
+radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 2px);
+background-size: 600px 600px, 400px 400px;
+background-position: 0 0, 40px 60px;
+opacity: 0.2;
+}
+/* --- 头部 Hero Section --- */
+.hero-section {
+position: relative;
+width: 100%;
+height: 60vh;
+overflow: hidden;
+border-bottom: 3px solid var(--fgo-gold);
+box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+.hero-slide {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+opacity: 0; transition: opacity 1.5s ease-in-out;
+background-size: cover; background-position: center;
+display: flex; align-items: flex-end; justify-content: center;
+}
+.hero-slide::before {
+content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+background: linear-gradient(to bottom, rgba(10, 12, 16, 0.3) 0%, rgba(10, 12, 16, 0.8) 100%);
+}
+.hero-slide.active { opacity: 1; }
+.hero-title-wrapper {
+position: relative; z-index: 2;
+padding: 15px 40px;
+border: 1px solid rgba(212, 175, 55, 0.5);
+background: rgba(10, 12, 16, 0.85);
+backdrop-filter: blur(5px);
+clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+transition: all 0.3s;
+cursor: pointer;
+margin-bottom: 60px;
+}
+.hero-title-wrapper:hover {
+border-color: var(--fgo-gold);
+background: rgba(212, 175, 55, 0.15);
+transform: translateY(-5px);
+}
+.hero-title-text {
+font-family: 'Cinzel', serif;
+font-size: 3rem;
+background: linear-gradient(to bottom, var(--fgo-gold-light), var(--fgo-gold));
+-webkit-background-clip: text;
+color: transparent;
+text-transform: uppercase;
+letter-spacing: 5px;
+margin: 0;
+line-height: 1.2;
+text-align: center;
+}
+/* --- 主容器 --- */
+.container {
+max-width: 1400px;
+margin: 0 auto;
+padding: 60px 20px;
+position: relative;
+z-index: 1;
+}
+.section-header {
+text-align: center;
+margin-bottom: 60px;
+}
+.section-title {
+font-family: 'Cinzel', serif;
+color: var(--fgo-gold);
+font-size: 2.5rem;
+letter-spacing: 3px;
+display: inline-block;
+position: relative;
+padding-bottom: 15px;
+}
+.section-title::after {
+content: '';
+display: block;
+width: 80px;
+height: 3px;
+background: var(--fgo-gold);
+margin: 15px auto 0;
+}
+.section-subtitle {
+color: var(--text-sub);
+font-size: 1rem;
+letter-spacing: 2px;
+margin-top: 10px;
+text-transform: uppercase;
+}
+/* --- 新增：刷新提示样式 --- */
+.cache-notice {
+    color: var(--fgo-cyan);
+    font-size: 0.85rem;
+    margin-top: 15px;
+    padding: 8px 15px;
+    border: 1px dashed rgba(0, 188, 212, 0.4);
+    display: inline-block;
+    border-radius: 4px;
+    background: rgba(0, 188, 212, 0.05);
+    animation: pulseNotice 2s infinite;
+}
+@keyframes pulseNotice {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+/* --- 网格系统 --- */
+.char-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+gap: 40px;
+}
+.char-card {
+background: var(--fgo-panel);
+border-radius: 2px;
+overflow: hidden;
+transition: transform 0.3s, box-shadow 0.3s;
+cursor: pointer;
+border: 1px solid rgba(255, 255, 255, 0.05);
+position: relative;
+box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+.char-card::before, .char-card::after {
+content: ''; position: absolute; width: 15px; height: 15px;
+border: 1px solid var(--fgo-gold); transition: all 0.3s;
+z-index: 2;
+}
+.char-card::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.char-card::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+.char-card:hover {
+transform: translateY(-8px);
+border-color: var(--fgo-gold);
+box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+.char-img-container {
+width: 100%;
+height: 320px;
+overflow: hidden;
+position: relative;
+background: #000;
+}
+.char-img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: transform 0.5s;
+filter: brightness(0.9);
+}
+.char-card:hover .char-img {
+transform: scale(1.05);
+filter: brightness(1.1);
+}
+.char-info {
+padding: 20px;
+text-align: center;
+background: linear-gradient(to top, #0a0c10 0%, rgba(21, 25, 34, 0.9) 100%);
+border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+.char-name {
+font-family: 'Cinzel', serif;
+font-size: 1.4rem;
+color: var(--fgo-gold);
+margin: 0;
+font-weight: 700;
+letter-spacing: 1px;
+}
+.char-class {
+font-size: 1rem;
+color: var(--fgo-cyan);
+margin-top: 8px;
+font-style: italic;
+text-transform: uppercase;
+letter-spacing: 2px;
+}
+/* --- 侧边功能按钮组 --- */
+.side-actions {
+position: fixed;
+top: 50%;
+width: 100%;
+transform: translateY(-50%);
+z-index: 3000;
+pointer-events: none;
+display: flex;
+justify-content: space-between;
+padding: 0 20px;
+box-sizing: border-box;
+}
+.side-btn-wrapper {
+pointer-events: auto;
+position: relative;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 10px;
+}
+.side-btn {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+background: linear-gradient(135deg, #1a237e, #0d1221);
+border: 2px solid var(--fgo-gold);
+color: var(--fgo-gold);
+font-size: 28px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+position: relative;
+overflow: hidden;
+}
+.side-btn::before {
+content: '';
+position: absolute;
+top: -50%; left: -50%; width: 200%; height: 200%;
+background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+opacity: 0;
+transform: scale(0.5);
+transition: opacity 0.4s, transform 0.4s;
+}
+.side-btn:hover {
+transform: scale(1.15) rotate(5deg);
+box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+background: linear-gradient(135deg, var(--fgo-gold), #b8860b);
+color: #000;
+border-color: #fff;
+}
+.side-btn:hover::before {
+opacity: 1;
+transform: scale(1);
+}
+.side-label {
+background: rgba(0,0,0,0.8);
+color: var(--fgo-gold);
+padding: 4px 12px;
+border: 1px solid var(--fgo-gold);
+font-size: 0.8rem;
+white-space: nowrap;
+border-radius: 20px;
+font-family: 'Cinzel', serif;
+letter-spacing: 1px;
+opacity: 0.8;
+transition: opacity 0.3s;
+pointer-events: none;
+}
+.side-btn:hover + .side-label {
+opacity: 1;
+transform: translateY(-5px);
+}
+/* --- 管理员控制栏 (含导出/导入) --- */
+.admin-bar {
+position: fixed;
+bottom: 20px;
+right: 20px;
+transform: translateY(100px);
+z-index: 2999;
+display: flex;
+flex-direction: column;
+gap: 10px;
+background: rgba(10, 12, 16, 0.95);
+padding: 10px;
+border-radius: 10px;
+border: 1px solid var(--fgo-gold);
+transition: all 0.4s;
+opacity: 0;
+pointer-events: none;
+}
+body.admin-mode .admin-bar {
+transform: translateY(0);
+opacity: 1;
+pointer-events: auto;
+}
+.admin-btn {
+background: var(--fgo-gold);
+color: #000;
+border: none;
+padding: 10px 20px;
+border-radius: 4px;
+font-weight: bold;
+cursor: pointer;
+font-family: 'Cinzel', serif;
+text-transform: uppercase;
+font-size: 0.85rem;
+transition: all 0.2s;
+white-space: nowrap;
+}
+.admin-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
+.admin-btn.danger { background: var(--fgo-red); color: white; }
+.admin-btn.secondary { background: var(--fgo-cyan); color: #000; }
+.card-actions {
+position: absolute; top: 10px; right: 10px;
+display: none; gap: 8px; z-index: 10;
+}
+body.admin-mode .card-actions { display: flex; }
+.action-btn {
+width: 35px; height: 35px;
+border-radius: 50%;
+border: 2px solid white;
+cursor: pointer;
+color: white;
+display: flex; align-items: center; justify-content: center;
+font-size: 16px;
+background: rgba(0,0,0,0.7);
+}
+.btn-edit { border-color: var(--fgo-cyan); color: var(--fgo-cyan); }
+.btn-del { border-color: var(--fgo-red); color: var(--fgo-red); }
+body.admin-mode .char-card { pointer-events: none; }
+body.admin-mode .card-actions { pointer-events: auto; }
+body.admin-mode .char-card:hover { transform: none; }
+/* --- 模态框通用 --- */
+.modal-overlay {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(5, 6, 8, 0.98);
+z-index: 2000;
+display: none; overflow-y: auto;
+}
+.modal-content {
+background: #151922;
+max-width: 1000px; margin: 40px auto;
+border: 1px solid var(--fgo-gold);
+position: relative; animation: slideUp 0.4s;
+min-height: 80vh;
+box-shadow: 0 0 50px rgba(0,0,0,0.8);
+color: #eceff1;
+}
+@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.close-btn {
+position: sticky; top: 10px; float: right; right: 10px;
+font-size: 2.5rem; color: var(--fgo-gold);
+cursor: pointer; background: rgba(0,0,0,0.5);
+width: 40px; height: 40px; text-align: center;
+line-height: 40px; border-radius: 50%;
+z-index: 20; border: 1px solid var(--fgo-gold);
+}
+.close-btn:hover { background: var(--fgo-red); color: white; }
+/* --- 详情与表单样式 --- */
+.detail-header { height: 350px; background-size: cover; background-position: center; position: relative; box-shadow: inset 0 -100px 100px -50px #151922; }
+.detail-body { padding: 30px; position: relative; margin-top: -60px; z-index: 5; }
+.detail-title-block { text-align: center; margin-bottom: 40px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 20px; }
+.detail-title { font-family: 'Cinzel', serif; font-size: 2.5rem; color: var(--fgo-gold); margin: 0; }
+.detail-subtitle { color: var(--fgo-cyan); font-size: 1.2rem; margin-top: 5px; text-transform: uppercase; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; background: rgba(0,0,0,0.3); padding: 20px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 30px; }
+.stat-item { text-align: center; padding: 10px; background: rgba(255,255,255,0.02); }
+.stat-label { color: var(--text-sub); font-size: 0.75rem; display: block; margin-bottom: 5px; text-transform: uppercase; }
+.stat-value { color: var(--fgo-gold); font-weight: bold; font-size: 1.1rem; font-family: 'Cinzel', serif; }
+.section-box { margin-bottom: 30px; background: rgba(0,0,0,0.2); padding: 25px; border-left: 4px solid var(--fgo-gold); }
+.section-box h3 { font-family: 'Cinzel', serif; color: var(--fgo-cyan); margin-top: 0; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px; }
+.skill-list, .np-list { display: flex; flex-direction: column; gap: 15px; }
+.skill-item, .np-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px; display: flex; gap: 15px; align-items: flex-start; }
+.skill-icon { width: 60px; height: 60px; background: #000; border: 2px solid var(--fgo-gold); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--fgo-gold); font-size: 1.5rem; overflow: hidden; }
+.skill-icon img { width: 100%; height: 100%; object-fit: cover; }
+.skill-content { flex: 1; }
+.skill-name { color: var(--fgo-gold); font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; }
+.skill-rank { color: var(--fgo-red); font-size: 0.9rem; border: 1px solid var(--fgo-red); padding: 2px 6px; }
+.skill-desc { color: #cfd8dc; font-size: 0.95rem; line-height: 1.6; white-space: pre-line; }
+.np-item { border-left: 4px solid var(--fgo-buster); }
+.np-item.arts { border-left-color: var(--fgo-arts); }
+.np-item.quick { border-left-color: var(--fgo-quick); }
+.np-item.extra { border-left-color: var(--fgo-gold); }
+.np-type-badge { font-size: 0.7rem; text-transform: uppercase; padding: 2px 6px; color: white; margin-left: 10px; font-weight: bold; }
+.bg-buster { background: var(--fgo-buster); }
+.bg-arts { background: var(--fgo-arts); }
+.bg-quick { background: var(--fgo-quick); }
+.bg-extra { background: var(--fgo-gold); color: black; }
+.bond-item { background: rgba(183, 28, 28, 0.05); padding: 15px; margin-bottom: 10px; border-left: 2px solid var(--fgo-red); font-style: italic; }
+.grail-end { background: rgba(183, 28, 28, 0.1); padding: 30px; border: 1px solid var(--fgo-red); text-align: center; font-style: italic; color: #ffcdd2; }
+/* 表单 */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; color: var(--fgo-cyan); margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid #37474f; color: white; font-family: inherit; box-sizing: border-box; }
+.form-group input:focus, .form-group textarea:focus { border-color: var(--fgo-gold); outline: none; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.dynamic-list-editor { background: rgba(0,0,0,0.3); padding: 15px; border: 1px dashed var(--fgo-cyan); margin-bottom: 15px; }
+.list-entry { background: rgba(255,255,255,0.03); padding: 15px; margin-bottom: 10px; border-left: 3px solid var(--fgo-cyan); position: relative; }
+.list-entry input, .list-entry textarea { width: 100%; margin-bottom: 8px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; padding: 8px; }
+.remove-entry { position: absolute; top: 5px; right: 5px; background: var(--fgo-red); color: white; border: none; width: 25px; height: 25px; cursor: pointer; }
+.add-entry-btn { background: transparent; border: 1px dashed var(--fgo-cyan); color: var(--fgo-cyan); padding: 10px; cursor: pointer; width: 100%; text-align: center; font-weight: bold; }
+.add-entry-btn:hover { background: rgba(0, 188, 212, 0.1); }
+.icon-upload-trigger { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; cursor: pointer; z-index: 5; }
+.skill-icon:hover .icon-upload-trigger { opacity: 1; }
+.icon-upload-trigger span { color: white; font-size: 20px; }
+.save-btn { width: 100%; padding: 15px; background: var(--fgo-gold); color: #000; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 20px; }
+.save-btn:hover { filter: brightness(1.1); }
+/* 裁剪器 */
+.cropper-modal { z-index: 4000; }
+.cropper-container-box { max-width: 800px; max-height: 60vh; margin: 20px auto; background: #000; }
+.cropper-actions { text-align: center; padding: 20px; background: #151922; }
+/* --- 召唤动画特效 --- */
+.summon-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 5000; display: none; justify-content: center; align-items: center; flex-direction: column; overflow: hidden; }
+.summon-circle { width: 300px; height: 300px; border: 5px solid var(--fgo-gold); border-radius: 50%; position: relative; box-shadow: 0 0 50px var(--fgo-gold), inset 0 0 50px var(--fgo-gold); animation: rotateCircle 2s linear infinite; opacity: 0; }
+.summon-circle::before, .summon-circle::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 2px solid var(--fgo-cyan); border-radius: 50%; }
+.summon-circle::before { width: 200px; height: 200px; animation: pulseCircle 1s ease-in-out infinite; }
+.summon-circle::after { width: 100px; height: 100px; border-color: var(--fgo-red); animation: pulseCircle 1s ease-in-out infinite reverse; }
+.summon-text { margin-top: 50px; font-family: 'Cinzel', serif; font-size: 2rem; color: var(--fgo-gold); text-transform: uppercase; letter-spacing: 5px; opacity: 0; animation: fadeInText 1s ease-out 1s forwards; }
+@keyframes rotateCircle { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulseCircle { 0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } }
+@keyframes fadeInText { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+/* 随机技能展示卡片 */
+.random-skill-card { background: linear-gradient(135deg, #151922, #0a0c10); border: 2px solid var(--fgo-gold); padding: 40px; max-width: 600px; margin: 100px auto; text-align: center; border-radius: 10px; box-shadow: 0 0 50px rgba(212, 175, 55, 0.2); animation: slideUp 0.5s; position: relative; overflow: hidden; }
+.random-skill-card::before { content: 'RANDOM SKILL | 随机技能'; position: absolute; top: 10px; left: 0; width: 100%; text-align: center; color: rgba(255,255,255,0.1); font-family: 'Cinzel', serif; font-size: 3rem; pointer-events: none; }
+.rs-icon { width: 100px; height: 100px; margin: 0 auto 20px; border: 3px solid var(--fgo-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--fgo-gold); background: #000; overflow: hidden; }
+.rs-icon img { width: 100%; height: 100%; object-fit: cover; }
+.rs-name { font-family: 'Cinzel', serif; font-size: 2rem; color: var(--fgo-gold); margin-bottom: 10px; }
+.rs-owner { color: var(--fgo-cyan); font-size: 1.2rem; margin-bottom: 20px; font-style: italic; }
+.rs-rank { display: inline-block; border: 1px solid var(--fgo-red); color: var(--fgo-red); padding: 5px 15px; border-radius: 2px; margin-bottom: 20px; font-weight: bold; }
+.rs-desc { color: #cfd8dc; font-size: 1.1rem; line-height: 1.8; white-space: pre-line; }
+.rs-close { margin-top: 30px; background: transparent; border: 1px solid var(--fgo-gold); color: var(--fgo-gold); padding: 10px 30px; cursor: pointer; font-family: 'Cinzel', serif; transition: all 0.3s; }
+.rs-close:hover { background: var(--fgo-gold); color: #000; }
+/* --- 管理员密码弹窗 --- */
+#adminAuthModal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0, 0, 0, 0.85);
+backdrop-filter: blur(8px);
+z-index: 9999;
+justify-content: center;
+align-items: center;
+opacity: 0;
+transition: opacity 0.4s ease;
+}
+#adminAuthModal.visible {
+opacity: 1;
+}
+.auth-box {
+background: linear-gradient(145deg, #1a237e, #0d1221);
+padding: 40px;
+width: 320px;
+border: 2px solid var(--fgo-gold);
+border-radius: 4px;
+text-align: center;
+position: relative;
+box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(0,0,0,0.5);
+transform: scale(0.9);
+transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+pointer-events: auto;
+z-index: 10000;
+}
+#adminAuthModal.visible .auth-box {
+transform: scale(1);
+}
+.auth-box::before, .auth-box::after {
+content: ''; position: absolute; width: 20px; height: 20px;
+border: 2px solid var(--fgo-gold); transition: all 0.5s;
+}
+.auth-box::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.auth-box::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+.auth-title {
+font-family: 'Cinzel', serif;
+color: var(--fgo-gold);
+font-size: 1.4rem;
+margin-bottom: 25px;
+letter-spacing: 2px;
+text-transform: uppercase;
+border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+padding-bottom: 10px;
+}
+.auth-input {
+width: 100%;
+padding: 12px;
+background: rgba(0, 0, 0, 0.6);
+border: 1px solid #37474f;
+color: var(--fgo-gold);
+font-family: 'Cinzel', serif;
+font-size: 1.1rem;
+text-align: center;
+letter-spacing: 3px;
+outline: none;
+transition: all 0.3s;
+box-sizing: border-box;
+}
+.auth-input:focus {
+border-color: var(--fgo-gold);
+box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+background: rgba(0, 0, 0, 0.8);
+}
+.auth-input.error {
+border-color: var(--fgo-red);
+color: var(--fgo-red);
+animation: shake 0.4s;
+}
+@keyframes shake {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-10px); }
+75% { transform: translateX(10px); }
+}
+.auth-hint {
+margin-top: 15px;
+font-size: 0.75rem;
+color: var(--text-sub);
+font-style: italic;
+}
+</style>
+</head>
+<body>
+<div class="magic-particles"></div>
+<!-- 头部 Hero -->
+<div class="hero-section" id="heroSlider"></div>
+<!-- 主内容 -->
+<div class="container">
+<div class="section-header">
+<h2 class="section-title">SERVANT DIRECTORY | 英灵图鉴</h2>
+<div class="section-subtitle">Chaldea Security Organization | 迦勒底安全组织</div>
+<!-- ✅ 新增：缓存刷新提示 -->
+<div class="cache-notice">
+    💡 如果没有刷新页面，请按下 <strong>Ctrl + F5</strong> (Windows) 或 <strong>Cmd + Shift + R</strong> (Mac) 清除缓存以体验最新版本
+</div>
+</div>
+<div class="char-grid" id="charGrid"></div>
+</div>
+<!-- 侧边功能按钮组 -->
+<div class="side-actions">
+<div class="side-btn-wrapper">
+<button class="side-btn" onclick="startSummon()" title="Random Summon | 随机召唤">🔮</button>
+<div class="side-label">SUMMON | 召唤</div>
+</div>
+<div class="side-btn-wrapper">
+<button class="side-btn" onclick="showRandomSkill()" title="Random Skill | 随机技能">⚡</button>
+<div class="side-label">SKILL | 技能</div>
+</div>
+</div>
+<!-- 底部管理员操作栏 (含导出/导入) -->
+<div class="admin-bar" id="adminBar">
+<button class="admin-btn" onclick="openEditModal()">➕ Summon | 召唤 (编辑)</button>
+<button class="admin-btn secondary" onclick="exportData()">💾 Export Data | 导出数据</button>
+<label class="admin-btn secondary" style="cursor:pointer; display:inline-block;">
+📂 Import Data | 导入数据
+<input type="file" id="importFile" style="display:none" onchange="importData(this)" accept=".json">
+</label>
+<button class="admin-btn danger" onclick="resetData()">⚠️ Reset | 重置</button>
+<button class="admin-btn" style="background:#555; color:white;" onclick="logoutAdmin()">🔒 Lock | 锁定</button>
+</div>
+<!-- 详情查看模态框 -->
+<div class="modal-overlay" id="viewModal">
+<div class="modal-content">
+<span class="close-btn" onclick="closeModal('viewModal')">&times;</span>
+<div class="detail-header" id="viewHeader"></div>
+<div class="detail-body">
+<div class="detail-title-block">
+<h1 class="detail-title" id="viewName"></h1>
+<div class="detail-subtitle" id="viewClassSub"></div>
+</div>
+<div class="stats-grid" id="viewStats"></div>
+<div class="section-box"><h3>📜 Profile | 个人资料</h3><p id="viewAppearance" style="line-height: 1.8; color: #cfd8dc;"></p></div>
+<div class="section-box" id="viewSkillsBox">
+<h3>⚔️ Skills | 持有技能</h3>
+<div class="skill-list" id="viewSkills"></div>
+</div>
+<div class="section-box" id="viewClassSkillsBox">
+<h3>🛡️ Class Skills | 职阶技能</h3>
+<div class="skill-list" id="viewClassSkills"></div>
+</div>
+<div class="section-box" id="viewNoblePhantasmBox">
+<h3>✨ Noble Phantasm | 宝具</h3>
+<div class="np-list" id="viewNoblePhantasm"></div>
+</div>
+<div class="section-box"><h3>✨ Catalyst & Wish | 触媒与愿望</h3><p style="line-height: 1.8; color: #cfd8dc;"><strong>Catalyst | 触媒:</strong> <span id="viewCatalyst"></span><br><br><strong>Grail Wish | 圣杯愿望:</strong> <span id="viewWish"></span></p></div>
+<div class="section-box"><h3>❤️ Bond Stories | 羁绊故事</h3><div id="viewBonds"></div></div>
+<div class="section-box"><h3>🏆 Grail End | 圣杯结局</h3><div class="grail-end" id="viewGrailEnd"></div></div>
+</div>
+</div>
+</div>
+<!-- 编辑/新增 模态框 -->
+<div class="modal-overlay" id="editModal">
+<div class="modal-content" style="margin: 20px auto; max-height: 90vh; overflow-y: auto;">
+<span class="close-btn" onclick="closeModal('editModal')">&times;</span>
+<div class="detail-body">
+<h2 class="detail-title" id="editTitle" style="font-size: 2rem; margin-bottom: 30px; text-align: center;">Edit Servant | 编辑英灵</h2>
+<form id="charForm" onsubmit="saveCharacter(event)">
+<input type="hidden" id="editId">
+<div class="form-row">
+<div class="form-group"><label>Name | 名称</label><input type="text" id="editName" required></div>
+<div class="form-group"><label>Class | 职阶</label><input type="text" id="editClass" required></div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>🖼️ Header Image | 头图</label>
+<button type="button" class="admin-btn" style="width:100%" onclick="triggerImageUpload('header')">Select Image | 选择图片</button>
+<input type="hidden" id="editHeaderImg">
+<div id="headerPreview" style="height:60px; margin-top:10px; background:#000; border:2px solid #444; display:none; background-size:cover;"></div>
+</div>
+<div class="form-group">
+<label>🖼️ Avatar | 头像</label>
+<button type="button" class="admin-btn" style="width:100%" onclick="triggerImageUpload('avatar')">Select Image | 选择图片</button>
+<input type="hidden" id="editAvatar">
+<div id="avatarPreview" style="height:60px; margin-top:10px; background:#000; border:2px solid #444; display:none; background-size:cover;"></div>
+</div>
+</div>
+<h3 style="color:var(--fgo-cyan); border-bottom:1px solid #333; margin-top:30px; padding-bottom:10px;">Parameters | 基础参数</h3>
+<div class="form-row">
+<div class="form-group"><label>True Name | 真名</label><input type="text" id="editTrueName"></div>
+<div class="form-group"><label>Gender | 性别</label><input type="text" id="editGender"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Height | 身高</label><input type="text" id="editHeight"></div>
+<div class="form-group"><label>Weight | 体重</label><input type="text" id="editWeight"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Origin | 出处</label><input type="text" id="editOrigin"></div>
+<div class="form-group"><label>Region | 地域</label><input type="text" id="editRegion"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Alignment | 阵营</label><input type="text" id="editAlignment"></div>
+<div class="form-group"><label>Attribute | 属性</label><input type="text" id="editAttribute"></div>
+</div>
+<div class="form-group"><label>Description | 简介</label><textarea id="editAppearance" rows="4"></textarea></div>
+<div class="form-row">
+<div class="form-group"><label>Catalyst | 触媒</label><input type="text" id="editCatalyst"></div>
+<div class="form-group"><label>Grail Wish | 愿望</label><input type="text" id="editWish"></div>
+</div>
+<h3 style="color:var(--fgo-cyan); border-bottom:1px solid #333; margin-top:30px; padding-bottom:10px;">⚔️ Skills | 技能</h3>
+<div id="editorSkills" class="dynamic-list-editor"></div>
+<button type="button" class="add-entry-btn" onclick="addSkillEntry('editorSkills', 'skill')">+ Add Skill | 添加技能</button>
+<h3 style="color:var(--fgo-cyan); border-bottom:1px solid #333; margin-top:30px; padding-bottom:10px;">🛡️ Class Skills | 职阶技能</h3>
+<div id="editorClassSkills" class="dynamic-list-editor"></div>
+<button type="button" class="add-entry-btn" onclick="addSkillEntry('editorClassSkills', 'classSkill')">+ Add Class Skill | 添加职阶技能</button>
+<h3 style="color:var(--fgo-cyan); border-bottom:1px solid #333; margin-top:30px; padding-bottom:10px;">✨ Noble Phantasm | 宝具</h3>
+<div id="editorNoblePhantasms" class="dynamic-list-editor"></div>
+<button type="button" class="add-entry-btn" onclick="addNoblePhantasmEntry()">+ Add NP | 添加宝具</button>
+<h3 style="color:var(--fgo-cyan); border-bottom:1px solid #333; margin-top:30px; padding-bottom:10px;">Bond Stories | 羁绊</h3>
+<div class="form-group"><label>One story per line | 每行一个故事</label><textarea id="editBonds" style="height: 120px;"></textarea></div>
+<h3 style="color:var(--fgo-cyan); border-bottom:1px solid #333; margin-top:30px; padding-bottom:10px;">Ending | 结局</h3>
+<div class="form-group"><label>Grail End | 圣杯结局</label><textarea id="editGrailEnd"></textarea></div>
+<button type="submit" class="save-btn">💾 Save | 保存</button>
+</form>
+</div>
+</div>
+</div>
+<!-- 图片裁剪模态框 -->
+<div class="modal-overlay cropper-modal" id="cropperModal">
+<div class="modal-content" style="max-width: 90%; margin: 20px auto;">
+<span class="close-btn" onclick="closeCropper()">&times;</span>
+<div class="detail-body">
+<h2 class="detail-title" style="font-size:1.5rem; text-align:center;">Crop Image | 裁剪图片</h2>
+<div class="cropper-container-box">
+<img id="imageToCrop" style="max-width: 100%; display: block;">
+</div>
+<div class="cropper-actions">
+<p style="color:#aaa; margin-bottom:15px">Drag to select | 拖动选择区域</p>
+<button class="admin-btn" onclick="cropImage()" style="font-size: 1rem; padding: 10px 30px;">✅ Confirm | 确认</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 召唤动画层 -->
+<div class="summon-overlay" id="summonOverlay">
+<div class="summon-circle"></div>
+<div class="summon-text">SUMMONING... | 召唤中...</div>
+</div>
+<!-- 随机技能展示层 -->
+<div class="modal-overlay" id="randomSkillModal">
+<div class="random-skill-card" id="randomSkillContent">
+<!-- 动态内容 -->
+</div>
+</div>
+<!-- 管理员密码验证弹窗 -->
+<div id="adminAuthModal">
+<div class="auth-box">
+<div class="auth-title">Access Control<br><span style="font-size:0.8em; color:var(--text-sub)">权限验证</span></div>
+<input type="password" id="adminPasswordInput" class="auth-input" placeholder="Enter Password | 输入密码" autocomplete="off">
+<div class="auth-hint">Press Enter to Confirm | 按回车确认</div>
+</div>
+</div>
+<script>
+// ✅ 修复：在此处定义 isAdmin 变量，防止报错
+let isAdmin = false;
+
+// ================= 数据初始化 =================
+const defaultData = [
+{
+id: "saber_01", name: "Artoria Pendragon | 阿尔托莉雅·潘德拉贡",
+headerImage: "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?q=80&w=2069",
+avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400",
+stats: { trueName: "Artoria", class: "Saber", gender: "Female | 女性", height: "154cm", weight: "42kg", origin: "Arthurian Legend | 亚瑟王传说", region: "Britain | 不列颠", alignment: "Lawful Good | 秩序·善", attribute: "Human | 人", appearance: "A golden-haired girl in blue armor. Her eyes are firm, holding the invisible sword. Despite her youthful appearance, she carries the dignity of a king.\n身着蓝甲的金发少女。眼神坚定，握着无形之剑。虽外表年轻，却拥有王的威严。" },
+skills: [
+{ name: "Magic Resistance | 对魔力", rank: "A", desc: "Nullifies magic of A-Rank or below. Modern mages cannot harm her.\n无效化A等级以下的魔术。现代魔术师无法伤害她。", icon: null },
+{ name: "Riding | 骑乘", rank: "A+", desc: "Can ride virtually any vehicle or beast with supernatural skill.\n能驾驭几乎所有载具或神兽。", icon: null }
+],
+classSkills: [
+{ name: "Charisma | 领导力", rank: "B", desc: "Natural talent to command an army. Increases ally morale.\n指挥军队的天生才能。提升友军士气。", icon: null }
+],
+noblePhantasms: [
+{ name: "Excalibur | 誓约胜利之剑", type: "Buster", rank: "A++", desc: "The Sword of Promised Victory. A beam of light that converges the planet's energy.\n汇聚星球能量的光之炮击。", icon: null }
+],
+catalyst: "Sheath of Excalibur (Avalon) | 剑鞘阿瓦隆", wish: "To save Britain and choose a proper king.\n拯救不列颠并选出真正的王。",
+bonds: ["Bond 1: She keeps a polite distance.\n保持礼貌的距离。", "Bond 5: She trusts you completely.\n完全信任你。", "Final Bond: A promise for eternity.\n永恒的约定。"],
+grailEnd: "If the Grail granted her wish, she might choose to live as a normal girl, sharing tea with you on a quiet afternoon.\n如果圣杯实现了愿望，她或许会选择作为普通少女，在宁静的午后与你共饮红茶。"
+}
+];
+// ================= ✨ 进阶配置：自动加载远程数据 ✨ =================
+// 【重要】请在这里填入你的 GitHub Raw 链接
+// 格式示例: "https://raw.githubusercontent.com/你的用户名/你的仓库名/main/fgo_data_backup_xxx.json"
+// 如果留空或无效，系统将自动回退到本地缓存或默认数据
+const REMOTE_DATA_URL = "https://raw.githubusercontent.com/goodsaod/goodsaod-s-Hall-of-Heroes/refs/heads/main/%E6%9B%BF%E6%8D%A2%E7%89%88%E6%9C%AC.json";
+let characters = []; // 初始化为空，等待加载
+// 定义一个异步函数来加载数据
+async function loadRemoteData() {
+try {
+// 1. 尝试从网络加载
+if (REMOTE_DATA_URL && REMOTE_DATA_URL.startsWith("http")) {
+console.log("🌐 正在从 GitHub 加载数据...");
+const response = await fetch(REMOTE_DATA_URL);
+if (!response.ok) throw new Error("网络响应错误：" + response.status);
+const remoteData = await response.json();
+if (Array.isArray(remoteData)) {
+characters = remoteData;
+// 更新本地缓存，方便离线查看或网络失败时使用
+localStorage.setItem('myFateCharacters', JSON.stringify(characters));
+console.log("✅ 远程数据加载成功！共加载 " + characters.length + " 条记录。");
+renderAll(); // 渲染页面
+return;
+} else {
+throw new Error("数据格式不正确，不是数组");
+}
+}
+} catch (error) {
+console.warn("⚠️ 远程加载失败，将使用本地缓存或默认数据:", error.message);
+}
+// 2. 如果网络加载失败或未配置，则使用本地缓存
+const localData = localStorage.getItem('myFateCharacters');
+if (localData) {
+characters = JSON.parse(localData);
+console.log("📂 使用本地缓存数据");
+} else {
+characters = defaultData;
+console.log("🆕 使用默认数据");
+}
+renderAll();
+}
+// 启动加载流程
+loadRemoteData();
+// ================= 核心逻辑 =================
+function saveToLocal() {
+localStorage.setItem('myFateCharacters', JSON.stringify(characters));
+renderAll();
+}
+function renderAll() {
+renderSlider();
+renderGrid();
+}
+function renderSlider() {
+const slider = document.getElementById('heroSlider');
+slider.innerHTML = '';
+const showChars = characters.slice(0, Math.min(characters.length, 5));
+if(showChars.length === 0) return;
+showChars.forEach((char, index) => {
+const slide = document.createElement('div');
+slide.className = `hero-slide ${index === 0 ? 'active' : ''}`;
+slide.style.backgroundImage = `url('${char.headerImage}')`;
+const wrapper = document.createElement('div');
+wrapper.className = 'hero-title-wrapper';
+wrapper.onclick = () => openView(char.id);
+const title = document.createElement('h2');
+title.className = 'hero-title-text';
+const namePart = char.name.split('|')[0].trim();
+const classPart = char.stats.class;
+title.innerText = `${classPart} — ${namePart}`;
+wrapper.appendChild(title);
+slide.appendChild(wrapper);
+slider.appendChild(slide);
+});
+let current = 0;
+if(window.slideInterval) clearInterval(window.slideInterval);
+if(showChars.length > 1) {
+window.slideInterval = setInterval(() => {
+const slides = document.querySelectorAll('.hero-slide');
+if(slides.length === 0) return;
+slides[current].classList.remove('active');
+current = (current + 1) % slides.length;
+slides[current].classList.add('active');
+}, 5000);
+}
+}
+function renderGrid() {
+const grid = document.getElementById('charGrid');
+grid.innerHTML = '';
+characters.forEach(char => {
+const card = document.createElement('div');
+card.className = 'char-card';
+if(!isAdmin) card.onclick = () => openView(char.id);
+const imgHtml = `<div class="char-img-container"><img src="${char.avatar}" class="char-img" onerror="this.src='https://via.placeholder.com/400x600?text=No+Image'"></div>`;
+let actionsHtml = '';
+if(isAdmin) {
+actionsHtml = `<div class="card-actions">
+<button class="action-btn btn-edit" onclick="event.stopPropagation(); openEditModal('${char.id}')" title="Edit | 编辑">✏️</button>
+<button class="action-btn btn-del" onclick="event.stopPropagation(); deleteChar('${char.id}')" title="Delete | 删除">🗑️</button>
+</div>`;
+}
+card.innerHTML = `${actionsHtml}${imgHtml}<div class="char-info"><h3 class="char-name">${char.name}</h3><div class="char-class">${char.stats.class}</div></div>`;
+grid.appendChild(card);
+});
+}
+// ================= 管理员验证逻辑 =================
+const authModal = document.getElementById('adminAuthModal');
+const pwdInput = document.getElementById('adminPasswordInput');
+const authBox = document.querySelector('.auth-box');
+document.addEventListener('click', function(e) {
+if (isAuthModalOpen || authBox.contains(e.target)) {
+return;
+}
+if(e.target.tagName === 'BUTTON' || e.target.closest('.side-btn') || e.target.closest('.char-card')) {
+return;
+}
+clickCount++;
+if(clickTimer) clearTimeout(clickTimer);
+clickTimer = setTimeout(() => {
+clickCount = 0;
+}, 1500);
+if(clickCount === 5) {
+openAuthModal();
+clickCount = 0;
+if(clickTimer) clearTimeout(clickTimer);
+}
+});
+function openAuthModal() {
+isAuthModalOpen = true;
+pwdInput.value = '';
+pwdInput.classList.remove('error');
+authModal.style.display = 'flex';
+requestAnimationFrame(() => {
+authModal.classList.add('visible');
+setTimeout(() => pwdInput.focus(), 100);
+});
+}
+function closeAuthModal() {
+isAuthModalOpen = false;
+authModal.classList.remove('visible');
+setTimeout(() => {
+authModal.style.display = 'none';
+}, 400);
+}
+pwdInput.addEventListener('keydown', function(e) {
+if(e.key === 'Enter') {
+if(pwdInput.value === ADMIN_PASSWORD) {
+enableAdminMode();
+closeAuthModal();
+} else {
+pwdInput.classList.add('error');
+pwdInput.value = '';
+pwdInput.placeholder = "Access Denied | 拒绝访问";
+setTimeout(() => {
+pwdInput.classList.remove('error');
+pwdInput.placeholder = "Enter Password | 输入密码";
+pwdInput.focus();
+}, 1000);
+}
+}
+});
+authModal.addEventListener('click', function(e) {
+if(e.target === authModal) {
+closeAuthModal();
+}
+});
+document.addEventListener('keydown', function(e) {
+if(e.key === 'Escape' && isAuthModalOpen) {
+closeAuthModal();
+}
+});
+function enableAdminMode() {
+isAdmin = true;
+document.body.classList.add('admin-mode');
+renderGrid();
+}
+function logoutAdmin() {
+isAdmin = false;
+document.body.classList.remove('admin-mode');
+renderGrid();
+}
+// ================= 导出与导入功能 =================
+function exportData() {
+const dataStr = JSON.stringify(characters, null, 2);
+const blob = new Blob([dataStr], { type: "application/json" });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = `fgo_data_backup_${new Date().toISOString().slice(0,10)}.json`;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+alert("✅ Data exported!\n数据已导出！\n请上传此 JSON 文件到 GitHub，并在需要时导入。");
+}
+function importData(input) {
+const file = input.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = function(e) {
+try {
+const importedData = JSON.parse(e.target.result);
+if (Array.isArray(importedData)) {
+characters = importedData;
+saveToLocal();
+alert("✅ Data imported successfully!\n数据已成功导入并更新！");
+} else {
+alert("❌ Invalid file format.\n文件格式不正确。");
+}
+} catch (err) {
+alert("❌ Error reading file: " + err.message);
+}
+};
+reader.readAsText(file);
+input.value = '';
+}
+// ================= 召唤与随机技能功能 =================
+function startSummon() {
+if(characters.length === 0) {
+alert("No servants available! Please add some first.\n| 暂无从者！请先添加一些从者。");
+return;
+}
+const overlay = document.getElementById('summonOverlay');
+overlay.style.display = 'flex';
+setTimeout(() => {
+const randomIndex = Math.floor(Math.random() * characters.length);
+const selectedChar = characters[randomIndex];
+overlay.style.display = 'none';
+openView(selectedChar.id);
+}, 2500);
+}
+function showRandomSkill() {
+if(characters.length === 0) {
+alert("No servants available!\n| 暂无从者！");
+return;
+}
+let allSkills = [];
+characters.forEach(char => {
+if(char.skills) char.skills.forEach(s => allSkills.push({ ...s, owner: char.name, type: 'Skill | 持有技能' }));
+if(char.classSkills) char.classSkills.forEach(s => allSkills.push({ ...s, owner: char.name, type: 'Class Skill | 职阶技能' }));
+if(char.noblePhantasms) char.noblePhantasms.forEach(np => allSkills.push({ ...np, owner: char.name, type: `Noble Phantasm (${np.type}) | 宝具` }));
+});
+if(allSkills.length === 0) {
+alert("No skills found!\n| 未找到任何技能！");
+return;
+}
+const randomSkill = allSkills[Math.floor(Math.random() * allSkills.length)];
+const modal = document.getElementById('randomSkillModal');
+const content = document.getElementById('randomSkillContent');
+const iconHtml = randomSkill.icon ? `<img src="${randomSkill.icon}" alt="icon">` : (randomSkill.name ? randomSkill.name.charAt(0) : '?');
+content.innerHTML = `
+<div class="rs-icon">${iconHtml}</div>
+<div class="rs-name">${randomSkill.name}</div>
+<div class="rs-owner">${randomSkill.owner}</div>
+<div class="rs-rank">${randomSkill.rank || '?'}</div>
+<div class="rs-desc">${randomSkill.desc || 'No description.'}</div>
+<button class="rs-close" onclick="closeModal('randomSkillModal')">Close | 关闭</button>
+`;
+modal.style.display = 'block';
+document.body.style.overflow = 'hidden';
+}
+// ================= 图片处理与其他功能 =================
+function triggerImageUpload(target, context = null) {
+currentCropTarget = target;
+currentSkillEditContext = context;
+const input = document.createElement('input');
+input.type = 'file';
+input.accept = 'image/*';
+input.onchange = e => {
+const file = e.target.files[0];
+if(file) {
+const reader = new FileReader();
+reader.onload = event => {
+document.getElementById('imageToCrop').src = event.target.result;
+document.getElementById('cropperModal').style.display = 'block';
+if(cropper) cropper.destroy();
+const image = document.getElementById('imageToCrop');
+let aspectRatio = NaN;
+if(target === 'header') aspectRatio = 16/9;
+else if(target === 'avatar') aspectRatio = 2/3;
+else if(target.startsWith('skill_icon')) aspectRatio = 1;
+cropper = new Cropper(image, {
+aspectRatio: aspectRatio,
+viewMode: 1,
+autoCropArea: 0.9,
+guides: true,
+center: true,
+highlight: false,
+cropBoxMovable: true,
+cropBoxResizable: true,
+toggleDragModeOnDblclick: false,
+});
+};
+reader.readAsDataURL(file);
+}
+};
+input.click();
+}
+function cropImage() {
+if(!cropper) return;
+const canvas = cropper.getCroppedCanvas({ maxWidth: 1920, maxHeight: 1080, fillColor: '#000' });
+const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+if(currentCropTarget === 'header') {
+document.getElementById('editHeaderImg').value = dataUrl;
+const prev = document.getElementById('headerPreview');
+prev.style.backgroundImage = `url(${dataUrl})`;
+prev.style.display = 'block';
+prev.style.border = '2px solid var(--fgo-gold)';
+} else if(currentCropTarget === 'avatar') {
+document.getElementById('editAvatar').value = dataUrl;
+const prev = document.getElementById('avatarPreview');
+prev.style.backgroundImage = `url(${dataUrl})`;
+prev.style.display = 'block';
+prev.style.border = '2px solid var(--fgo-gold)';
+} else if(currentCropTarget.startsWith('skill_icon')) {
+if(currentSkillEditContext) {
+const { containerId, index, type } = currentSkillEditContext;
+const container = document.getElementById(containerId);
+const entries = container.querySelectorAll('.list-entry');
+if(entries[index]) {
+const hiddenInput = entries[index].querySelector('.inp-icon');
+if(hiddenInput) hiddenInput.value = dataUrl;
+const btn = entries[index].querySelector('.icon-upload-btn');
+if(btn) {
+btn.innerText = "✅ Selected | 已选";
+btn.style.background = "rgba(56, 142, 60, 0.3)";
+btn.style.borderColor = "#388e3c";
+}
+}
+}
+}
+closeCropper();
+}
+function closeCropper() {
+document.getElementById('cropperModal').style.display = 'none';
+if(cropper) { cropper.destroy(); cropper = null; }
+}
+function addSkillEntry(containerId, type) {
+const container = document.getElementById(containerId);
+const count = container.children.length;
+if(count >= 5) { alert('Max 5 skills | 最多5个技能'); return; }
+const index = count;
+const div = document.createElement('div');
+div.className = 'list-entry';
+div.innerHTML = `
+<button type="button" class="remove-entry" onclick="this.parentElement.remove()">×</button>
+<div style="display:flex; gap:15px; align-items:flex-start; margin-bottom:10px;">
+<div style="position:relative; width:60px; height:60px; flex-shrink:0;">
+<div class="skill-icon" style="width:60px; height:60px; font-size:1.2rem; border-width:1px;">?</div>
+<div class="icon-upload-trigger" onclick="triggerImageUpload('skill_icon_${index}_${type}', {containerId:'${containerId}', index:${index}, type:'${type}'})">
+<span>📷</span>
+</div>
+<input type="hidden" class="inp-icon" value="">
+</div>
+<div style="flex:1;">
+<input type="text" placeholder="Skill Name | 技能名" class="inp-name" required>
+<div style="display:flex; gap:10px;">
+<input type="text" placeholder="Rank (A, B+)" class="inp-rank" style="width:100px">
+</div>
+</div>
+</div>
+<textarea placeholder="Description | 描述" class="inp-desc" rows="2"></textarea>
+<button type="button" class="icon-upload-btn" style="background:transparent; border:1px dashed #666; color:#aaa; padding:5px 10px; cursor:pointer; font-size:0.8rem; margin-top:5px;" onclick="triggerImageUpload('skill_icon_${index}_${type}', {containerId:'${containerId}', index:${index}, type:'${type}'})">📷 Upload Icon | 上传图标</button>
+`;
+container.appendChild(div);
+}
+function addNoblePhantasmEntry() {
+const container = document.getElementById('editorNoblePhantasms');
+const count = container.children.length;
+if(count >= 5) { alert('Max 5 NPs | 最多5个宝具'); return; }
+const index = count;
+const div = document.createElement('div');
+div.className = 'list-entry';
+div.innerHTML = `
+<button type="button" class="remove-entry" onclick="this.parentElement.remove()">×</button>
+<div style="display:flex; gap:15px; align-items:flex-start; margin-bottom:10px;">
+<div style="position:relative; width:60px; height:60px; flex-shrink:0;">
+<div class="skill-icon" style="width:60px; height:60px; font-size:1.2rem; border-width:1px;">?</div>
+<div class="icon-upload-trigger" onclick="triggerImageUpload('skill_icon_${index}_np', {containerId:'editorNoblePhantasms', index:${index}, type:'np'})">
+<span>📷</span>
+</div>
+<input type="hidden" class="inp-icon" value="">
+</div>
+<div style="flex:1;">
+<input type="text" placeholder="NP Name | 宝具名" class="inp-name" required>
+<div style="display:flex; gap:10px;">
+<select class="inp-type" style="padding:8px; background:#000; color:white; border:1px solid #444;">
+<option value="Buster">Buster</option>
+<option value="Arts">Arts</option>
+<option value="Quick">Quick</option>
+<option value="Extra">Extra</option>
+</select>
+<input type="text" placeholder="Rank" class="inp-rank" style="width:80px">
+</div>
+</div>
+</div>
+<textarea placeholder="Description | 描述" class="inp-desc" rows="2"></textarea>
+<button type="button" class="icon-upload-btn" style="background:transparent; border:1px dashed #666; color:#aaa; padding:5px 10px; cursor:pointer; font-size:0.8rem; margin-top:5px;" onclick="triggerImageUpload('skill_icon_${index}_np', {containerId:'editorNoblePhantasms', index:${index}, type:'np'})">📷 Upload Icon | 上传图标</button>
+`;
+container.appendChild(div);
+}
+function loadDynamicList(containerId, dataList, type) {
+const container = document.getElementById(containerId);
+container.innerHTML = '';
+if(!dataList) return;
+dataList.forEach((item, idx) => {
+const div = document.createElement('div');
+div.className = 'list-entry';
+let typeSelect = '';
+if(type === 'np') {
+typeSelect = `<select class="inp-type" style="padding:8px; background:#000; color:white; border:1px solid #444;">
+<option value="Buster" ${item.type==='Buster'?'selected':''}>Buster</option>
+<option value="Arts" ${item.type==='Arts'?'selected':''}>Arts</option>
+<option value="Quick" ${item.type==='Quick'?'selected':''}>Quick</option>
+<option value="Extra" ${item.type==='Extra'?'selected':''}>Extra</option>
+</select>`;
+}
+const iconPreview = item.icon ? `<img src="${item.icon}" style="width:100%; height:100%; object-fit:cover;">` : (item.name ? item.name.charAt(0) : '?');
+const btnText = item.icon ? "✅ Change | 更换" : "📷 Upload | 上传";
+const btnStyle = item.icon ? "background:rgba(56, 142, 60, 0.3); border-color:#388e3c; color:#fff;" : "";
+div.innerHTML = `
+<button type="button" class="remove-entry" onclick="this.parentElement.remove()">×</button>
+<div style="display:flex; gap:15px; align-items:flex-start; margin-bottom:10px;">
+<div style="position:relative; width:60px; height:60px; flex-shrink:0;">
+<div class="skill-icon" style="width:60px; height:60px; font-size:1.2rem; border-width:1px;">${iconPreview}</div>
+<div class="icon-upload-trigger" onclick="triggerImageUpload('skill_icon_${idx}_${type}', {containerId:'${containerId}', index:${idx}, type:'${type}'})">
+<span>📷</span>
+</div>
+<input type="hidden" class="inp-icon" value="${item.icon || ''}">
+</div>
+<div style="flex:1;">
+<input type="text" placeholder="Name | 名称" class="inp-name" value="${item.name || ''}" required>
+<div style="display:flex; gap:10px;">
+${typeSelect}
+<input type="text" placeholder="Rank" class="inp-rank" value="${item.rank || ''}" style="width:${type==='np'?'80px':'100px'}">
+</div>
+</div>
+</div>
+<textarea placeholder="Description | 描述" class="inp-desc" rows="2">${item.desc || ''}</textarea>
+<button type="button" class="icon-upload-btn" style="background:transparent; border:1px dashed #666; color:#aaa; padding:5px 10px; cursor:pointer; font-size:0.8rem; margin-top:5px; ${btnStyle}" onclick="triggerImageUpload('skill_icon_${idx}_${type}', {containerId:'${containerId}', index:${idx}, type:'${type}'})">${btnText}</button>
+`;
+container.appendChild(div);
+});
+}
+function getDynamicListData(containerId, type) {
+const container = document.getElementById(containerId);
+const entries = container.querySelectorAll('.list-entry');
+const result = [];
+entries.forEach(entry => {
+const name = entry.querySelector('.inp-name').value;
+if(!name) return;
+const rank = entry.querySelector('.inp-rank').value;
+const desc = entry.querySelector('.inp-desc').value;
+const icon = entry.querySelector('.inp-icon').value;
+const obj = { name, rank, desc, icon: icon || null };
+if(type === 'np') {
+obj.type = entry.querySelector('.inp-type').value;
+}
+result.push(obj);
+});
+return result;
+}
+function resetData() {
+if(confirm('⚠️ WARNING: Reset all data? | 警告：重置所有数据？')) {
+localStorage.removeItem('myFateCharacters');
+characters = JSON.parse(JSON.stringify(defaultData));
+renderAll();
+alert('Data reset | 数据已重置');
+}
+}
+function deleteChar(id) {
+if(confirm('Delete this servant? | 删除此英灵？')) {
+characters = characters.filter(c => c.id !== id);
+saveToLocal();
+}
+}
+function openView(id) {
+const char = characters.find(c => c.id === id);
+if(!char) return;
+document.getElementById('viewHeader').style.backgroundImage = `url('${char.headerImage}')`;
+document.getElementById('viewName').innerText = char.name;
+document.getElementById('viewClassSub').innerText = char.stats.class;
+document.getElementById('viewAppearance').innerText = char.stats.appearance;
+document.getElementById('viewCatalyst').innerText = char.stats.catalyst || 'None | 无';
+document.getElementById('viewWish').innerText = char.stats.wish || 'None | 无';
+document.getElementById('viewGrailEnd').innerText = char.grailEnd || 'Unknown | 未知';
+const statsDiv = document.getElementById('viewStats');
+statsDiv.innerHTML = '';
+const keys = [{k:'trueName', l:'True Name | 真名'}, {k:'class', l:'Class | 职阶'}, {k:'gender', l:'Gender | 性别'}, {k:'height', l:'Height | 身高'}, {k:'weight', l:'Weight | 体重'}, {k:'origin', l:'Origin | 出处'}, {k:'region', l:'Region | 地域'}, {k:'alignment', l:'Alignment | 阵营'}, {k:'attribute', l:'Attribute | 属性'}];
+keys.forEach(k => { statsDiv.innerHTML += `<div class="stat-item"><span class="stat-label">${k.l}</span><span class="stat-value">${char.stats[k.k] || '-'}</span></div>`; });
+renderSkillList('viewSkills', char.skills);
+document.getElementById('viewSkillsBox').style.display = (char.skills && char.skills.length > 0) ? 'block' : 'none';
+renderSkillList('viewClassSkills', char.classSkills);
+document.getElementById('viewClassSkillsBox').style.display = (char.classSkills && char.classSkills.length > 0) ? 'block' : 'none';
+renderNPList('viewNoblePhantasm', char.noblePhantasms);
+document.getElementById('viewNoblePhantasmBox').style.display = (char.noblePhantasms && char.noblePhantasms.length > 0) ? 'block' : 'none';
+const bondsDiv = document.getElementById('viewBonds');
+bondsDiv.innerHTML = '';
+if(char.bonds && char.bonds.length > 0) {
+char.bonds.forEach((b, i) => bondsDiv.innerHTML += `<div class="bond-item"><strong>Bond ${i+1}:</strong> ${b}</div>`);
+} else {
+bondsDiv.innerHTML = '<p style="color:#666">No bond stories recorded... | 暂无羁绊故事</p>';
+}
+document.getElementById('viewModal').style.display = 'block';
+document.body.style.overflow = 'hidden';
+}
+function renderSkillList(containerId, list) {
+const container = document.getElementById(containerId);
+container.innerHTML = '';
+if(!list || list.length === 0) return;
+list.forEach(skill => {
+const iconContent = skill.icon ? `<img src="${skill.icon}" alt="${skill.name}">` : skill.name.charAt(0);
+container.innerHTML += `
+<div class="skill-item">
+<div class="skill-icon">${iconContent}</div>
+<div class="skill-content">
+<div class="skill-name">${skill.name} <span class="skill-rank">${skill.rank || '?'}</span></div>
+<div class="skill-desc">${skill.desc || ''}</div>
+</div>
+</div>`;
+});
+}
+function renderNPList(containerId, list) {
+const container = document.getElementById(containerId);
+container.innerHTML = '';
+if(!list || list.length === 0) return;
+list.forEach(np => {
+const typeClass = np.type ? np.type.toLowerCase() : 'buster';
+const typeLabel = np.type || 'BUSTER';
+const iconContent = np.icon ? `<img src="${np.icon}" alt="${np.name}">` : np.name.charAt(0);
+container.innerHTML += `
+<div class="np-item ${typeClass}">
+<div class="skill-icon" style="border-color: var(--fgo-${typeClass === 'extra' ? 'gold' : typeClass})">${iconContent}</div>
+<div class="skill-content">
+<div class="skill-name">
+${np.name}
+<span>
+<span class="np-type-badge bg-${typeClass}">${typeLabel}</span>
+<span class="skill-rank">${np.rank || '?'}</span>
+</span>
+</div>
+<div class="skill-desc">${np.desc || ''}</div>
+</div>
+</div>`;
+});
+}
+function openEditModal(id = null) {
+if(!isAdmin) return;
+const form = document.getElementById('charForm');
+form.reset();
+document.getElementById('headerPreview').style.display = 'none';
+document.getElementById('avatarPreview').style.display = 'none';
+if(id) {
+const char = characters.find(c => c.id === id);
+document.getElementById('editTitle').innerText = 'Edit: ' + char.name.split('|')[0];
+document.getElementById('editId').value = char.id;
+document.getElementById('editName').value = char.name;
+document.getElementById('editClass').value = char.stats.class;
+document.getElementById('editHeaderImg').value = char.headerImage;
+document.getElementById('editAvatar').value = char.avatar;
+if(char.headerImage) { document.getElementById('headerPreview').style.backgroundImage = `url(${char.headerImage})`; document.getElementById('headerPreview').style.display = 'block'; document.getElementById('headerPreview').style.border = '2px solid var(--fgo-gold)'; }
+if(char.avatar) { document.getElementById('avatarPreview').style.backgroundImage = `url(${char.avatar})`; document.getElementById('avatarPreview').style.display = 'block'; document.getElementById('avatarPreview').style.border = '2px solid var(--fgo-gold)'; }
+['trueName','gender','height','weight','origin','region','alignment','attribute','appearance','catalyst','wish','grailEnd'].forEach(k => {
+const val = (k==='grailEnd') ? char[k] : (char.stats[k] || '');
+const el = document.getElementById('edit'+k.charAt(0).toUpperCase()+k.slice(1));
+if(el) el.value = val;
+});
+document.getElementById('editBonds').value = char.bonds ? char.bonds.join('\n') : '';
+loadDynamicList('editorSkills', char.skills, 'skill');
+loadDynamicList('editorClassSkills', char.classSkills, 'classSkill');
+loadDynamicList('editorNoblePhantasms', char.noblePhantasms, 'np');
+} else {
+document.getElementById('editTitle').innerText = 'Summon New Servant | 召唤新英灵';
+document.getElementById('editId').value = '';
+document.getElementById('editId').dataset.newId = 'servant_' + Date.now();
+document.getElementById('editorSkills').innerHTML = '';
+document.getElementById('editorClassSkills').innerHTML = '';
+document.getElementById('editorNoblePhantasms').innerHTML = '';
+}
+document.getElementById('editModal').style.display = 'block';
+document.body.style.overflow = 'hidden';
+}
+function saveCharacter(e) {
+e.preventDefault();
+if(!isAdmin) return;
+const idInput = document.getElementById('editId');
+const id = idInput.value || idInput.dataset.newId;
+const newChar = {
+id: id,
+name: document.getElementById('editName').value,
+headerImage: document.getElementById('editHeaderImg').value || 'https://via.placeholder.com/1920x1080?text=No+Header',
+avatar: document.getElementById('editAvatar').value || 'https://via.placeholder.com/400x600?text=No+Avatar',
+stats: {
+trueName: document.getElementById('editTrueName').value,
+class: document.getElementById('editClass').value,
+gender: document.getElementById('editGender').value,
+height: document.getElementById('editHeight').value,
+weight: document.getElementById('editWeight').value,
+origin: document.getElementById('editOrigin').value,
+region: document.getElementById('editRegion').value,
+alignment: document.getElementById('editAlignment').value,
+attribute: document.getElementById('editAttribute').value,
+appearance: document.getElementById('editAppearance').value,
+catalyst: document.getElementById('editCatalyst').value,
+wish: document.getElementById('editWish').value
+},
+skills: getDynamicListData('editorSkills', 'skill'),
+classSkills: getDynamicListData('editorClassSkills', 'classSkill'),
+noblePhantasms: getDynamicListData('editorNoblePhantasms', 'np'),
+bonds: document.getElementById('editBonds').value.split('\n').filter(l=>l.trim()),
+grailEnd: document.getElementById('editGrailEnd').value
+};
+if(idInput.value) {
+const index = characters.findIndex(c => c.id === id);
+if(index !== -1) characters[index] = newChar;
+} else {
+characters.push(newChar);
+}
+saveToLocal();
+closeModal('editModal');
+alert('✅ Saved! | 保存成功！');
+}
+function closeModal(modalId) {
+document.getElementById(modalId).style.display = 'none';
+document.body.style.overflow = 'auto';
+}
+window.onclick = function(event) {
+if (event.target.classList.contains('modal-overlay') && !event.target.classList.contains('cropper-modal')) {
+closeModal(event.target.id);
+}
+}
+// 注意：renderAll() 已经在 loadRemoteData() 中调用，无需在此重复调用
+// 但为了安全起见，如果 loadRemoteData 还没执行完，这里可以保留一个备用调用（可选）
+// renderAll();
+</script>
+</body>
+</html>
